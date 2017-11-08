@@ -4,15 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +38,10 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         db = openOrCreateDatabase("ToDoListDb", Context.MODE_PRIVATE, null);
         db.execSQL("CREATE TABLE IF NOT EXISTS item(id NUMBER,name VARCHAR,task VARCHAR, date VARCHAR, time VARCHAR);");
 
-        if (!isDbEmpty()) {
+        //if (!isDbItemsEmpty()) {
             insertMockData();
-        }
-
+        //}
         listar();
-
     }
 
     @Override
@@ -70,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             lista.add("No hay registros");
         } else {
             while (c.moveToNext())
-                lista.add(c.getString(1) + "-" + c.getString(2)+"  "+ c.getString(3)+"  "+ c.getString(4));
+                lista.add(c.getString(1) + " - " + c.getString(2) + "   " + c.getString(4));
         }
 
         adaptador = new ArrayAdapter<String>(getApplicationContext(), R.layout.standard_listview, lista);
@@ -78,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         c.close();
     }
 
-    public boolean isDbEmpty() {
+    public boolean isDbItemsEmpty() {
         boolean res;
         Cursor c = db.rawQuery("SELECT * FROM item", null);
 
@@ -94,10 +89,15 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     public void insertMockData() {
 
         try {
-            for(int i=0;i<5;i++){
-                db.execSQL("INSERT INTO item VALUES (" + i+1 + ",'" + "Task_"+i + "','" + "08/11/2017"+"','" + "17:00"+"')");
-            }
+            for (int i = 0; i < 40; i++) {
+                try {
+                    db.execSQL("INSERT INTO item VALUES (" + i + 1 + ",'" + "Task" + "','" + "Task Description" + "','" + "08/11/2017" + "','" + "17:00" + "')");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.info("Error al insertar mockdata.");
+                }
 
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("Error al añadir datos de prueba");
