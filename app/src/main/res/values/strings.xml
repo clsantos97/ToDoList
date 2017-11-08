@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ToDoList</string>
+    <string name="btn_add">+</string>
+    <string name="tv_name">Nombre:</string>
+    <string name="tv_task">Tarea:</string>
+    <string name="tv_date">Fecha:</string>
+    <string name="tv_time">Hora:</string>
+    <string name="btn_create">CREAR</string>
+</resources>
