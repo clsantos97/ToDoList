@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +18,11 @@ import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements Button.OnClickListener {
 
-    private static final Logger logger = Logger.getLogger( MainActivity.class.getName() );
+    private static final Logger logger = Logger.getLogger(MainActivity.class.getName());
     private Button btnAdd;
     private ListView lvToDo;
     private SQLiteDatabase db;
+    public static final int CREATE_ITEM = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +38,15 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         // Init DB
         db = openOrCreateDatabase("ToDoListDb", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS item(id NUMBER,name VARCHAR,task VARCHAR, date VARCHAR, time VARCHAR);");
 
-        //if (!isDbItemsEmpty()) {
+        //db.execSQL("DROP TABLE item");
+        db.execSQL("CREATE TABLE IF NOT EXISTS item(" +
+                "item_id INTEGER PRIMARY KEY,name VARCHAR,task VARCHAR, date VARCHAR, time VARCHAR);");
+        db.execSQL("DELETE FROM item");
+
+        if (!isDbItemsEmpty()) {
             insertMockData();
-        //}
+        }
         listar();
     }
 
@@ -48,8 +54,32 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     public void onClick(View view) {
         if ((Button) view == btnAdd) { // EN ESTA VENTANA
             Intent intent = new Intent(this, CreateItem.class);
-            //intent.putExtra("mensaje", mensaje);
-            startActivity(intent);
+            startActivityForResult(intent, CREATE_ITEM);
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+
+        if (requestCode == CREATE_ITEM) {
+            if (resultCode == RESULT_OK) {
+                // se seleccionó correctamente la provincia
+                //t.setText("Se ha seleccionado:\n"+data.getStringExtra("PROVINCIA"));
+                try {
+                    db.execSQL("INSERT INTO item (name, task, date, time) VALUES ('" + data.getStringExtra("NAME") + "','" +
+                            data.getStringExtra("TASK") + "','" +
+                            data.getStringExtra("DATE") + "','" +
+                            data.getStringExtra("TIME") + "')");
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.info("New task insert error.");
+                }
+
+                listar();
+            } else {
+                logger.info("New res task insert error.");
+            }
         }
     }
 
@@ -65,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             lista.add("No hay registros");
         } else {
             while (c.moveToNext())
-                lista.add(c.getString(1) + " - " + c.getString(2) + "   " + c.getString(4));
+                lista.add(c.getString(0) + " " + c.getString(1) + " - " + c.getString(2) + "   " + c.getString(3) + "  " + c.getString(4));
         }
 
         adaptador = new ArrayAdapter<String>(getApplicationContext(), R.layout.standard_listview, lista);
@@ -89,9 +119,10 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     public void insertMockData() {
 
         try {
-            for (int i = 0; i < 40; i++) {
+            for (int i = 0; i < 5; i++) {
                 try {
-                    db.execSQL("INSERT INTO item VALUES (" + i + 1 + ",'" + "Task" + "','" + "Task Description" + "','" + "08/11/2017" + "','" + "17:00" + "')");
+                    //db.execSQL("INSERT INTO item VALUES (" + i + 1 + ",'" + "Task" + "','" + "Task Description" + "','" + "08/11/2017" + "','" + "17:00" + "')");
+                    db.execSQL("INSERT INTO item (name, task, date, time) VALUES ('Task','TaskDescription','08/11/2017','18:00')");
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.info("Error al insertar mockdata.");
@@ -103,4 +134,6 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             logger.info("Error al añadir datos de prueba");
         }
     }
+
+
 }

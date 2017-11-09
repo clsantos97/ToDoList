@@ -21,7 +21,7 @@
         android:id="@+id/btnAdd"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="6dp"
         android:background="#5CB85C"
         android:text="@string/btn_add"
